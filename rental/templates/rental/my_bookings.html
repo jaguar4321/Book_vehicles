@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Мої бронювання{% endblock %}
+{% block content %}
+<h2 class="text-center mb-4">Мої бронювання</h2>
+{% if bookings %}
+<div class="row">
+    {% for booking in bookings %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ booking.vehicle.name }}</h5>
+                <p class="card-text">
+                    Тип: 
+                    {% if booking.vehicle.vehicle_type == 'bike' %}Велосипед
+                    {% elif booking.vehicle.vehicle_type == 'scooter' %}Скутер
+                    {% elif booking.vehicle.vehicle_type == 'motorcycle' %}Мотоцикл
+                    {% endif %}
+                </p>
+                <p class="card-text">Локація: {{ booking.location.name }} ({{ booking.location.address }})</p>
+                <p class="card-text">Початок: {{ booking.start_time|date:"d.m.Y H:i" }}</p>
+                <p class="card-text">Кінець: {{ booking.end_time|date:"d.m.Y H:i" }}</p>
+                <p class="card-text">Сума: {{ booking.total_price }} грн</p>
+                <p class="card-text">
+                    Статус оплати:
+                    {% if booking.payment and booking.payment.is_paid %}Оплачено
+                    {% else %}Очікує оплати
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p class="text-center">У вас немає бронювань.</p>
+{% endif %}
+{% endblock %}
