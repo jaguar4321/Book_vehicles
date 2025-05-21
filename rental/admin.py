@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Vehicle, Booking, Payment, Location
+from .models import Vehicle, Booking, Payment
 
 @admin.register(Vehicle)
 class VehicleAdmin(admin.ModelAdmin):
@@ -9,4 +9,3 @@ class VehicleAdmin(admin.ModelAdmin):
 
 admin.site.register(Booking)
 admin.site.register(Payment)
-admin.site.register(Location)

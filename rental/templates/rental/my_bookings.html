@@ -2,36 +2,78 @@
 {% block title %}Мої бронювання{% endblock %}
 {% block content %}
 <h2 class="text-center mb-4">Мої бронювання</h2>
-{% if bookings %}
-<div class="row">
-    {% for booking in bookings %}
-    <div class="col-md-6 mb-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ booking.vehicle.name }}</h5>
-                <p class="card-text">
-                    Тип: 
-                    {% if booking.vehicle.vehicle_type == 'bike' %}Велосипед
-                    {% elif booking.vehicle.vehicle_type == 'scooter' %}Скутер
-                    {% elif booking.vehicle.vehicle_type == 'motorcycle' %}Мотоцикл
-                    {% endif %}
-                </p>
-                <p class="card-text">Локація: {{ booking.location.name }} ({{ booking.location.address }})</p>
-                <p class="card-text">Початок: {{ booking.start_time|date:"d.m.Y H:i" }}</p>
-                <p class="card-text">Кінець: {{ booking.end_time|date:"d.m.Y H:i" }}</p>
-                <p class="card-text">Сума: {{ booking.total_price }} грн</p>
-                <p class="card-text">
-                    Статус оплати:
-                    {% if booking.payment and booking.payment.is_paid %}Оплачено
-                    {% else %}Очікує оплати
-                    {% endif %}
-                </p>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-</div>
+{% if bookings_with_details %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Транспорт</th>
+                <th>Локація</th>
+                <th>Тариф</th>
+                <th>Час початку</th>
+                <th>Час закінчення</th>
+                <th>Ціна</th>
+                <th>Статус оплати</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in bookings_with_details %}
+                <tr>
+                    <td>{{ item.booking.vehicle.name }} ({{ item.booking.vehicle.vehicle_type }})</td>
+                    <td>{{ item.location }}</td>
+                    <td>{{ item.tariff }}</td>
+                    <td>{{ item.booking.start_time|default:"—" }}</td>
+                    <td>{{ item.booking.end_time|default:"—" }}</td>
+                    <td>{{ item.booking.total_price }} грн</td>
+                    <td>
+                        {% if item.is_paid %}
+                            <span class="badge bg-success">Оплачено</span>
+                        {% else %}
+                            <span class="badge bg-warning">Не оплачено</span>
+                            <a href="{% url 'payment' item.booking.id %}" class="btn btn-sm btn-primary">Оплатити</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 {% else %}
-<p class="text-center">У вас немає бронювань.</p>
+    <p>У вас немає бронювань.</p>
+{% endif %}
+
+<h2 class="text-center mb-4 mt-5">Мої активні тарифи</h2>
+{% if tariff_statuses %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Тариф</th>
+                <th>Тип транспорту</th>
+                <th>Локація</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tariff in tariff_statuses %}
+                <tr>
+                    <td>{{ tariff.tariff.name }}</td>
+                    <td>{{ tariff.vehicle_type }}</td>
+                    <td>{{ tariff.location }}</td>
+                    <td>
+                        {% if tariff.tariff.name == "Льготний проїзд (20 поїздок)" %}
+                            Залишилось поїздок: {{ tariff.remaining_rides }}
+                        {% elif tariff.tariff.name == "Безліміт на місяць" %}
+                            Діє до: {{ tariff.expiry_date|date:"Y-m-d H:i" }}
+                        {% else %}
+                            Активний
+                        {% endif %}
+                        {% if not tariff.is_active %}
+                            <span class="badge bg-danger">Неактивний</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>У вас немає активних тарифів.</p>
 {% endif %}
 {% endblock %}

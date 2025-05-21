@@ -30,10 +30,18 @@
                     {% endif %}
                 </p>
                 <p class="card-text">Ціна: {{ vehicle.price_per_hour }} грн/год</p>
+                <p class="card-text">
+                    Статус:
+                    {% if vehicle.booking_set.exists %}
+                        Заброньовано
+                    {% else %}
+                        Доступний
+                    {% endif %}
+                </p>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'book_vehicle' vehicle.id %}" class="btn btn-primary">Забронювати</a>
+                    <a href="{% url 'booking' vehicle.id %}" class="btn btn-primary">Обрати</a>
                 {% else %}
-                    <a href="{% url 'login' %}?next={% url 'book_vehicle' vehicle.id %}" class="btn btn-primary" onclick="alert('Будь ласка, увійдіть у систему, щоб забронювати транспорт.');">Забронювати</a>
+                    <a href="{% url 'login' %}?next={% url 'booking' vehicle.id %}" class="btn btn-primary" onclick="alert('Будь ласка, увійдіть у систему, щоб забронювати транспорт.');">Обрати</a>
                 {% endif %}
             </div>
         </div>

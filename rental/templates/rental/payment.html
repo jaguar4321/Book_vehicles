@@ -1,15 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}Оплата{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <h2 class="text-center mb-4">Оплата бронювання</h2>
-        <p>Загальна сума: {{ booking.total_price }} грн</p>
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary w-100">Оплатити</button>
-        </form>
-    </div>
-</div>
+<h2 class="text-center mb-4">Оплата бронювання</h2>
+{% if payment.booking.tariff.name == 'Студентський гаманець' %}
+    <h3 class="text-center mb-3">Сума до оплати з урахуванням знижки 50%: {{ payment.amount }} грн</h3>
+{% else %}
+    <h3 class="text-center mb-3">Сума до оплати: {{ payment.amount }} грн</h3>
+{% endif %}
+<form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Оплатити</button>
+</form>
 {% endblock %}

@@ -1,47 +1,38 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Booking, Payment
+from .models import Profile, Booking, Payment
 
-class CustomUserCreationForm(UserCreationForm):
-    email = forms.EmailField(required=True, label="Електронна пошта")
+class CustomUserCreationForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
-        labels = {
-            'username': 'Ім\'я користувача',
-            'password1': 'Пароль',
-            'password2': 'Підтвердження пароля',
-        }
+        fields = ['username', 'password']
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['avatar', 'bio', 'phone']
 
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['vehicle', 'location', 'start_time', 'end_time']
-        widgets = {
-            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        }
-        labels = {
-            'vehicle': 'Транспортний засіб',
-            'location': 'Локація',
-            'start_time': 'Час початку',
-            'end_time': 'Час закінчення',
-        }
+        fields = ['start_time', 'end_time']
 
-    def clean(self):
-        cleaned_data = super().clean()
-        start_time = cleaned_data.get('start_time')
-        end_time = cleaned_data.get('end_time')
-        if start_time and end_time and end_time <= start_time:
-            raise forms.ValidationError("Час закінчення має бути пізніше за час початку.")
-        return cleaned_data
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start_time'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        self.fields['end_time'].widget = forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
 
 class PaymentForm(forms.ModelForm):
     class Meta:
         model = Payment
-        fields = ['method']
-        labels = {
-            'method': 'Спосіб оплати',
-        }
+        fields = ['payment_method']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['payment_method'].widget = forms.Select(choices=self.fields['payment_method'].choices)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
