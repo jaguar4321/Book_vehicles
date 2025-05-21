@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Мій профіль{% endblock %}
+{% block content %}
+<h2 class="text-center mb-4">Мій профіль</h2>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+<div class="text-center mb-4">
+    {% if user.profile.avatar %}
+        <img src="{{ user.profile.avatar.url }}" alt="Аватар" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+    {% else %}
+        <img src="https://via.placeholder.com/150" alt="Аватар" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+    {% endif %}
+</div>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Зберегти</button>
+</form>
+<style>
+    .rounded-circle {
+        border-radius: 50%;
+    }
+</style>
+{% endblock %}

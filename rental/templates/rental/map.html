@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Карта Харкова{% endblock %}
+{% block content %}
+<h2 class="text-center mb-4">Виберіть пункт прийому в Харкові</h2>
+<div class="row">
+    <div class="col-12">
+        <div id="map" style="height: 400px;"></div>
+    </div>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script>
+    var map = L.map('map').setView([49.9935, 36.2304], 12); // Центр Харкова
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    var pickup_points = [
+        {id: 1, name: 'Пункт 1 - Центр', lat: 49.9935, lon: 36.2304, area: 'Центральний район Харкова'},
+        {id: 2, name: 'Пункт 2 - Салтівка', lat: 49.9903, lon: 36.2801, area: 'Салтівський район'},
+        {id: 3, name: 'Пункт 3 - Північна Салтівка', lat: 50.0300, lon: 36.2600, area: 'Північні райони Харкова'}
+    ];
+
+    pickup_points.forEach(function(point) {
+        var popupContent = '<b>' + point.name + '</b><br><a href="/pickup/' + point.id + '/">Вибрати</a>';
+        L.marker([point.lat, point.lon]).addTo(map)
+            .bindPopup(popupContent)
+            .openPopup();
+    });
+
+    pickup_points.forEach(function(point) {
+        L.circle([point.lat, point.lon], {
+            color: 'blue',
+            fillColor: '#blue',
+            fillOpacity: 0.2,
+            radius: 1000 // Радіус 1 км
+        }).addTo(map);
+    });
+</script>
+{% endblock %}

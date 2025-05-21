@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block title %}Вибір пункту{% endblock %}
+{% block content %}
+<h2 class="text-center mb-4">Ви обрали: {{ selected_point.name }}</h2>
+<p class="text-center">Область катання: {{ selected_point.area }}</p>
+<a href="{% url 'vehicles' selected_point.id %}" class="btn btn-primary d-block mx-auto" style="width: 200px;">Вибрати транспорт</a>
+{% endblock %}

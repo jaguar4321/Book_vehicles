@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Бронювання{% endblock %}
+{% block content %}
+<h2 class="text-center mb-4">Бронювання транспорту</h2>
+<h3>Обраний транспорт: {{ vehicle.name }} ({{ vehicle.vehicle_type }})</h3>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if active_tariff %}
+    <div class="alert alert-info">
+        <h5>Активний тариф: {{ active_tariff.tariff.name }}</h5>
+        <p>Для: {{ active_tariff.vehicle_type }} на локації {{ active_tariff.location.area }}</p>
+        {% if active_tariff.tariff.name == "Льготний проїзд (20 поїздок)" %}
+            <p>Залишилось поїздок: {{ active_tariff.remaining_rides }}</p>
+        {% elif active_tariff.tariff.name == "Безліміт на місяць" %}
+            <p>Діє до: {{ active_tariff.expiry_date|date:"Y-m-d H:i" }}</p>
+        {% endif %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <input type="hidden" name="book" value="true">
+            <button type="submit" class="btn btn-primary">Забронювати</button>
+        </form>
+    </div>
+{% else %}
+    <h4>Виберіть тариф</h4>
+    <div class="row">
+        <div class="col-md-6">
+            <h5>Доступні тарифи</h5>
+            {% for tariff in tariffs %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h6 class="card-title">{{ tariff.name }}</h6>
+                    <p class="card-text">Ціна: {{ tariff.price|default:tariff.description }}</p>
+                    <p class="card-text">{{ tariff.description }}</p>
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="tariff_id" value="{{ tariff.id }}">
+                        <button type="submit" class="btn btn-success">Обрати тариф</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-6">
+            {% if selected_tariff %}
+            <h5>Забронювати за тарифом: {{ selected_tariff.name }}</h5>
+            <form method="post" action="">
+                {% csrf_token %}
+                <input type="hidden" name="book" value="true">
+                {% if selected_tariff.name == 'Оплата почасово' or selected_tariff.name == 'Студентський гаманець' %}
+                <div class="mb-3">
+                    <label for="{{ form.start_time.id_for_label }}" class="form-label">Час початку:</label>
+                    {{ form.start_time }}
+                </div>
+                <div class="mb-3">
+                    <label for="{{ form.end_time.id_for_label }}" class="form-label">Час закінчення:</label>
+                    {{ form.end_time }}
+                </div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Забронювати</button>
+            </form>
+            {% else %}
+            <p>Будь ласка, виберіть тариф, щоб продовжити бронювання.</p>
+            {% endif %}
+        </div>
+    </div>
+    {% if selected_tariff %}
+        <p class="mt-3"><strong>Обраний тариф:</strong> {{ selected_tariff.name }} (Ціна: {{ selected_tariff.price|default:selected_tariff.description }})</p>
+    {% endif %}
+{% endif %}
+{% endblock %}
